@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f8e9ed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Petalo">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Petalo — Il mio calendario</title>
+<style>
+:root{--bg:#fff9fa;--paper:#fff;--ink:#493b40;--muted:#9d8d93;--line:#f0e3e7;--pink:#e9c4cf;--pink2:#f8e9ed;--rose:#b87589;--shadow:0 8px 28px #80546412;--radius:22px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit;color:inherit}button{border:0;cursor:pointer}
+.app{max-width:760px;margin:auto;padding:env(safe-area-inset-top) 18px calc(92px + env(safe-area-inset-bottom))}
+header{display:flex;justify-content:space-between;align-items:center;padding:22px 2px 18px}
+.brand{font-family:Georgia,serif;font-size:29px;letter-spacing:.3px}.brand small{display:block;font:11px -apple-system,sans-serif;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+.iconbtn{background:white;border:1px solid var(--line);border-radius:15px;width:42px;height:42px;font-size:18px;box-shadow:var(--shadow)}
+.tabs{display:flex;gap:7px;background:#f5e9ed;padding:5px;border-radius:15px;margin-bottom:17px}
+.tabs button{flex:1;background:transparent;padding:10px 5px;border-radius:11px;color:var(--muted);font-size:13px}
+.tabs button.active{background:white;color:var(--ink);box-shadow:0 2px 8px #80546412}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:17px;box-shadow:var(--shadow);margin-bottom:15px}
+.monthhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.monthname{font:24px Georgia,serif}.arrows{display:flex;gap:7px}.arrows button{background:var(--pink2);width:34px;height:34px;border-radius:11px;color:var(--rose)}
+.weekdays,.days{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;gap:4px}
+.weekdays{color:var(--muted);font-size:11px;margin-bottom:8px}
+.day{min-height:48px;border-radius:13px;background:transparent;padding:6px 2px 3px;position:relative;font-size:13px}
+.day.out{color:#c9bdc1}.day.today{background:var(--pink2);font-weight:700}.day.selected{outline:1.5px solid var(--rose);background:#fdf2f5}
+.dotrow{display:flex;justify-content:center;gap:3px;margin-top:4px}.dot{width:4px;height:4px;border-radius:50%;background:var(--rose)}
+.sectiontitle{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 10px}
+.sectiontitle h2{font:20px Georgia,serif;margin:0}.subtle{color:var(--muted);font-size:12px}
+.primary{background:var(--rose);color:white;padding:12px 17px;border-radius:14px;font-weight:600}
+.soft{background:var(--pink2);color:var(--rose);padding:10px 13px;border-radius:13px}
+.event{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}.event:last-child{border:0;padding-bottom:0}
+.colorbar{width:4px;min-height:42px;border-radius:9px;background:var(--rose);flex:none}
+.event strong{display:block;font-size:14px}.event small{display:block;color:var(--muted);margin-top:4px}
+.empty{color:var(--muted);text-align:center;padding:24px 8px;font-size:13px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#fffdfdF2;backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:10px 18px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:4}
+.bottominner{width:min(720px,100%);display:flex;justify-content:space-around;align-items:center}
+.navbtn{background:transparent;color:var(--muted);font-size:11px;display:grid;gap:4px;justify-items:center;min-width:55px}.navbtn span{font-size:20px}.navbtn.active{color:var(--rose)}
+.fab{background:var(--rose);color:white;border-radius:50%;width:52px;height:52px;font-size:28px;box-shadow:0 6px 18px #b8758945;margin-top:-27px;border:4px solid var(--bg)}
+.panel{display:none}.panel.active{display:block}
+.listrow{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.listrow:last-child{border:0}
+.listrow input[type=checkbox]{accent-color:var(--rose);width:18px;height:18px}.done{text-decoration:line-through;color:#b8aab0}
+textarea,.field{width:100%;border:1px solid var(--line);border-radius:13px;background:#fffafb;padding:12px;outline:none}
+textarea{min-height:100px;resize:vertical}.field:focus,textarea:focus{border-color:var(--pink)}
+label{font-size:12px;color:var(--muted);display:block;margin:12px 0 6px}
+.modalback{position:fixed;inset:0;background:#38262e55;display:none;align-items:flex-end;justify-content:center;z-index:10;padding:12px}.modalback.show{display:flex}
+.modal{width:min(600px,100%);background:var(--bg);border-radius:25px 25px 18px 18px;padding:20px;max-height:88vh;overflow:auto}
+.modalhead{display:flex;justify-content:space-between;align-items:center}.modalhead h2{font:23px Georgia,serif;margin:0}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.wide{grid-column:1/-1}
+.actions{display:flex;gap:9px;margin-top:18px}.actions button{flex:1}
+.pill{display:inline-block;background:var(--pink2);color:var(--rose);padding:5px 9px;border-radius:20px;font-size:11px}
+@media(min-width:650px){.day{min-height:62px;font-size:14px}.app{padding-top:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand">Petalo<small>il tempo, con calma</small></div><button class="iconbtn" id="todayBtn" aria-label="Vai a oggi">⌂</button></header>
+<div class="tabs" id="viewTabs"><button class="active" data-view="month">Mese</button><button data-view="week">Settimana</button><button data-view="agenda">Agenda</button></div>
+<section class="panel active" id="calendarPanel">
+<div class="card">
+ <div class="monthhead"><div><div class="monthname" id="monthLabel"></div><div class="subtle" id="yearLabel"></div></div><div class="arrows"><button id="prev">‹</button><button id="next">›</button></div></div>
+ <div class="weekdays"><div>LUN</div><div>MAR</div><div>MER</div><div>GIO</div><div>VEN</div><div>SAB</div><div>DOM</div></div>
+ <div class="days" id="days"></div>
+</div>
+<div class="sectiontitle"><h2 id="selectedLabel">Oggi</h2><span class="subtle" id="eventCount"></span></div>
+<div class="card" id="dayEvents"></div>
+</section>
+<section class="panel" id="tasksPanel">
+<div class="sectiontitle"><h2>Le mie cose da fare</h2><button class="soft" id="addTask">＋ Aggiungi</button></div>
+<div class="card" id="taskList"></div>
+</section>
+<section class="panel" id="notesPanel">
+<div class="sectiontitle"><h2>Note giornaliere</h2><span class="subtle" id="noteDate"></span></div>
+<div class="card"><textarea id="dailyNote" placeholder="Scrivi qui i tuoi pensieri, appunti o idee..."></textarea><div style="display:flex;justify-content:flex-end;margin-top:10px"><span class="subtle" id="saveState">Salvataggio automatico</span></div></div>
+<div class="sectiontitle"><h2>Promemoria</h2><button class="soft" id="addReminder">＋ Nuovo</button></div><div class="card" id="reminderList"></div>
+</section>
+</div>
+<nav class="bottom"><div class="bottominner">
+<button class="navbtn active" data-panel="calendarPanel"><span>▦</span>Calendario</button>
+<button class="navbtn" data-panel="tasksPanel"><span>✓</span>Attività</button>
+<button class="fab" id="fab" aria-label="Aggiungi">＋</button>
+<button class="navbtn" data-panel="notesPanel"><span>✎</span>Note</button>
+<button class="navbtn" id="allBtn"><span>♡</span>Riepilogo</button>
+</div></nav>
+<div class="modalback" id="modalBack"><div class="modal">
+<div class="modalhead"><h2 id="modalTitle">Nuovo appuntamento</h2><button class="iconbtn" id="closeModal">×</button></div>
+<div class="formgrid">
+<div class="wide"><label>Titolo</label><input class="field" id="fTitle" placeholder="Es. Appuntamento dal dentista"></div>
+<div><label>Data</label><input class="field" type="date" id="fDate"></div>
+<div><label>Ora</label><input class="field" type="time" id="fTime"></div>
+<div><label>Categoria</label><select class="field" id="fCategory"><option>Personale</option><option>Lavoro</option><option>Salute</option><option>Compleanno</option><option>Ricorrenza</option><option>Altro</option></select></div>
+<div><label>Tipo</label><select class="field" id="fType"><option>Appuntamento</option><option>Promemoria</option><option>Compleanno</option><option>Ricorrenza</option></select></div>
+<div class="wide"><label>Note (facoltative)</label><textarea id="fDetails" style="min-height:65px" placeholder="Aggiungi qualche dettaglio..."></textarea></div>
+</div>
+<div class="actions"><button class="soft" id="cancelModal">Annulla</button><button class="primary" id="saveEvent">Salva</button></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const today=new Date(); today.setHours(0,0,0,0);
+let selected=new Date(today), cursor=new Date(today.getFullYear(),today.getMonth(),1), view='month', panel='calendarPanel';
+const key='petalo-calendar-v1';
+let data=JSON.parse(localStorage.getItem(key)||'{"events":[],"tasks":[],"notes":{}}');
+const save=()=>localStorage.setItem(key,JSON.stringify(data));
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const parse=s=>{let [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const same=(a,b)=>iso(a)===iso(b);
+const monthNames=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const colors={Personale:'#c78fa2',Lavoro:'#9aa9b5',Salute:'#b6a0c8',Compleanno:'#d6a65e',Ricorrenza:'#c48c83',Altro:'#a6a09e'};
+const dayFmt=d=>d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
+function eventsOn(d){return data.events.filter(e=>e.date===iso(d)).sort((a,b)=>(a.time||'').localeCompare(b.time||''))}
+function render(){
+ $('monthLabel').textContent=monthNames[cursor.getMonth()];$('yearLabel').textContent=cursor.getFullYear();
+ $('selectedLabel').textContent= same(selected,today)?'Oggi':dayFmt(selected);
+ $('eventCount').textContent=eventsOn(selected).length+' impegni';
+ const grid=$('days');grid.innerHTML='';
+ let start=new Date(cursor.getFullYear(),cursor.getMonth(),1);let offset=(start.getDay()+6)%7;start.setDate(start.getDate()-offset);
+ let count=view==='week'?7:42;
+ if(view==='week'){start=new Date(selected);start.setDate(start.getDate()-((start.getDay()+6)%7));}
+ for(let i=0;i<count;i++){let d=new Date(start);d.setDate(start.getDate()+i);let b=document.createElement('button');b.className='day'+(d.getMonth()!==cursor.getMonth()&&view!=='week'?' out':'')+(same(d,today)?' today':'')+(same(d,selected)?' selected':'');b.innerHTML=`${d.getDate()}<div class="dotrow">${eventsOn(d).slice(0,3).map(e=>`<i class="dot" style="background:${colors[e.category]||colors.Altro}"></i>`).join('')}</div>`;b.onclick=()=>{selected=d;cursor=new Date(d.getFullYear(),d.getMonth(),1);render()};grid.append(b);}
+ if(view==='agenda')grid.innerHTML='';
+ const ev=eventsOn(selected);$('dayEvents').innerHTML=ev.length?ev.map(e=>`<div class="event"><div class="colorbar" style="background:${colors[e.category]||colors.Altro}"></div><div style="flex:1"><strong>${esc(e.title)}</strong><small>${e.time||'Tutto il giorno'} · ${esc(e.category)} · ${esc(e.type)}</small>${e.details?`<small>${esc(e.details)}</small>`:''}</div><button class="soft" data-del="${e.id}">×</button></div>`).join(''):'<div class="empty">Nessun impegno per questa giornata.<br>Un piccolo spazio tutto tuo.</div>';
+ $('dayEvents').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{data.events=data.events.filter(e=>e.id!==b.dataset.del);save();render()});
+ renderTasks();renderReminders();renderNote();
+}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderTasks(){$('taskList').innerHTML=data.tasks.length?data.tasks.map(t=>`<div class="listrow"><input type="checkbox" data-task="${t.id}" ${t.done?'checked':''}><span class="${t.done?'done':''}" style="flex:1">${esc(t.title)}</span><button class="soft" data-taskdel="${t.id}">×</button></div>`).join(''):'<div class="empty">La tua lista è ancora vuota.</div>';$('taskList').querySelectorAll('[data-task]').forEach(c=>c.onchange=()=>{let t=data.tasks.find(x=>x.id===c.dataset.task);t.done=c.checked;save();renderTasks()});$('taskList').querySelectorAll('[data-taskdel]').forEach(b=>b.onclick=()=>{data.tasks=data.tasks.filter(t=>t.id!==b.dataset.taskdel);save();renderTasks()})}
+function renderReminders(){let items=data.events.filter(e=>e.type==='Promemoria'||e.type==='Compleanno'||e.type==='Ricorrenza').sort((a,b)=>a.date.localeCompare(b.date));$('reminderList').innerHTML=items.length?items.map(e=>`<div class="event"><div class="colorbar" style="background:${colors[e.category]||colors.Altro}"></div><div><strong>${esc(e.title)}</strong><small>${parse(e.date).toLocaleDateString('it-IT')} · ${e.type}</small></div></div>`).join(''):'<div class="empty">I tuoi promemoria appariranno qui.</div>'}
+function renderNote(){let k=iso(selected);$('noteDate').textContent=dayFmt(selected);$('dailyNote').value=data.notes[k]||''}
+$('dailyNote').addEventListener('input',()=>{data.notes[iso(selected)]=$('dailyNote').value;save();$('saveState').textContent='Salvato';});
+function openModal(type='Appuntamento'){ $('modalTitle').textContent='Nuovo '+type.toLowerCase();$('fTitle').value='';$('fDate').value=iso(selected);$('fTime').value='';$('fCategory').value=type==='Compleanno'?'Compleanno':type==='Ricorrenza'?'Ricorrenza':'Personale';$('fType').value=type;$('fDetails').value='';$('modalBack').classList.add('show');}
+function closeModal(){$('modalBack').classList.remove('show')}
+$('fab').onclick=()=>openModal();$('addReminder').onclick=()=>openModal('Promemoria');$('addTask').onclick=()=>{let title=prompt('Cosa devi fare?');if(title?.trim()){data.tasks.push({id:crypto.randomUUID(),title:title.trim(),done:false});save();renderTasks()}};
+$('closeModal').onclick=$('cancelModal').onclick=closeModal;
+$('saveEvent').onclick=()=>{let title=$('fTitle').value.trim();if(!title){$('fTitle').focus();return}data.events.push({id:crypto.randomUUID(),title,date:$('fDate').value||iso(selected),time:$('fTime').value,category:$('fCategory').value,type:$('fType').value,details:$('fDetails').value.trim()});selected=parse($('fDate').value||iso(selected));cursor=new Date(selected.getFullYear(),selected.getMonth(),1);save();closeModal();render()};
+$('prev').onclick=()=>{if(view==='week')selected.setDate(selected.getDate()-7);else cursor.setMonth(cursor.getMonth()-1);if(view==='week')cursor=new Date(selected.getFullYear(),selected.getMonth(),1);render()};
+$('next').onclick=()=>{if(view==='week')selected.setDate(selected.getDate()+7);else cursor.setMonth(cursor.getMonth()+1);if(view==='week')cursor=new Date(selected.getFullYear(),selected.getMonth(),1);render()};
+$('todayBtn').onclick=()=>{selected=new Date(today);cursor=new Date(today.getFullYear(),today.getMonth(),1);render()};
+$('viewTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{view=b.dataset.view;$('viewTabs').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));render()});
+document.querySelectorAll('.navbtn[data-panel]').forEach(b=>b.onclick=()=>{panel=b.dataset.panel;document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===panel));document.querySelectorAll('.navbtn[data-panel]').forEach(x=>x.classList.toggle('active',x===b));});
+$('allBtn').onclick=()=>{alert(`Riepilogo Petalo\\nAppuntamenti e ricorrenze: ${data.events.length}\\nAttività da completare: ${data.tasks.filter(t=>!t.done).length}\\nNote salvate: ${Object.keys(data.notes).length}`)};
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>

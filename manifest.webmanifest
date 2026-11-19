@@ -1,0 +1,21 @@
+{
+  "name": "Petalo — Il mio calendario",
+  "short_name": "Petalo",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff9fa",
+  "theme_color": "#f8e9ed",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
