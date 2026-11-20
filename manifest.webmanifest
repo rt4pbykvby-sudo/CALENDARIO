@@ -1,6 +1,6 @@
 {
   "name": "Petalo — Il mio calendario",
-  "short_name": "Petalo",
+  "short_name": "CALENDARIO",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#fff9fa",
